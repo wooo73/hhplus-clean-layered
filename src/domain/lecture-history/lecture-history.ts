@@ -30,6 +30,12 @@ export class LectureHistory {
     @Column({ name: 'instructor_name', type: 'varchar', length: 10, comment: '강사명' })
     instructorName: string;
 
+    @Column({ type: 'datetime', comment: '강의 시작일 YYYY-MM-DD HH:mm' })
+    startAt: Date;
+
+    @Column({ type: 'datetime', comment: '강의 종료일 YYYY-MM-DD HH:mm' })
+    endAt: Date;
+
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 

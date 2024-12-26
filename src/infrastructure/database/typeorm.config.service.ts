@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
-import { Instructor } from 'src/domain/instructor/instructor';
-import { LectureHistory } from 'src/domain/lecture-history/lecture-history';
-import { Lecture } from 'src/domain/lecture/lecture';
-import { User } from 'src/domain/user/user';
+import { Instructor } from '../../domain/instructor/instructor';
+import { LectureHistory } from '../../domain/lecture-history/lecture-history';
+import { Lecture } from '../../domain/lecture/lecture';
+import { User } from '../../domain/user/user';
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
@@ -19,6 +19,8 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
             database: this.configService.get<string>('DATABASE_NAME'),
             entities: [User, Lecture, LectureHistory, Instructor],
             synchronize: false,
+            autoLoadEntities: true, // 자동으로 엔티티를 로드
+            logging: true,
         };
     }
 }

@@ -19,6 +19,9 @@ export class Lecture {
     @Column({ type: 'varchar', length: 50, comment: '강의명' })
     title: string;
 
+    @Column({ type: 'int', comment: '수강 인원' })
+    capacity: number;
+
     @Column({ type: 'datetime', comment: '강의 시작일 YYYY-MM-DD HH:mm' })
     startAt: Date;
 
