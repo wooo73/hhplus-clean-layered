@@ -18,6 +18,8 @@ describe('LectureService', () => {
     beforeEach(async () => {
         lectureRepository = {
             findLectureById: jest.fn(),
+            getUserLectures: jest.fn(),
+            availableLectures: jest.fn(),
         };
 
         lectureHistoryRepository = {
@@ -243,6 +245,118 @@ describe('LectureService', () => {
                 userId,
                 lecture,
             );
+        });
+    });
+
+    describe('특강 신청 가능 목록 단위 테스트', () => {
+        it('SUCCESS_신청한 강의를 제외하고 응답 하는가? ', async () => {
+            // given
+            const userId = 1;
+            const startAt = '2024-12-21 00:00:00';
+            const endAt = '2024-12-21 23:59:59';
+
+            const userLectures: Partial<Lecture>[] = [
+                {
+                    id: 1,
+                    title: '강의1',
+                    startAt: new Date('2024-12-21T04:00:00.000Z'),
+                    endAt: new Date('2024-12-21T06:00:00.000Z'),
+                    capacity: 30,
+                },
+            ];
+
+            const availableLectureList: Partial<Lecture>[] = [
+                {
+                    id: 1,
+                    title: '강의1',
+                    startAt: new Date('2024-12-21T04:00:00.000Z'),
+                    endAt: new Date('2024-12-21T06:00:00.000Z'),
+                    capacity: 30,
+                },
+                {
+                    id: 2,
+                    title: '강의2',
+                    startAt: new Date('2024-12-21T07:00:00.000Z'),
+                    endAt: new Date('2024-12-21T09:00:00.000Z'),
+                    capacity: 30,
+                },
+            ];
+
+            lectureRepository.getUserLectures.mockResolvedValue(userLectures as Lecture[]);
+            lectureRepository.availableLectures.mockResolvedValue(
+                availableLectureList as Lecture[],
+            );
+
+            // when
+            const result = await service.getAvailableLectures(userId, startAt, endAt);
+
+            // then
+            expect(result).toBeDefined();
+            expect(result).toEqual([availableLectureList[1]]);
+            expect(lectureRepository.getUserLectures).toHaveBeenCalledWith(userId);
+            expect(lectureRepository.availableLectures).toHaveBeenCalledWith(startAt, endAt);
+        });
+
+        it('SUCCESS_신청한 강의 일정과 겹치지 않는 강의만 응답 하는가? ', async () => {
+            // given
+            const userId = 1;
+            const startAt = '2024-12-21 00:00:00';
+            const endAt = '2024-12-21 23:59:59';
+
+            const userLectures: Partial<Lecture>[] = [
+                {
+                    id: 1,
+                    title: '강의1',
+                    startAt: new Date('2024-12-21T04:00:00.000Z'),
+                    endAt: new Date('2024-12-21T06:00:00.000Z'),
+                    capacity: 30,
+                },
+            ];
+
+            const availableLectureList: Partial<Lecture>[] = [
+                {
+                    id: 1, //신청한 강의
+                    title: '강의1',
+                    startAt: new Date('2024-12-21T04:00:00.000Z'),
+                    endAt: new Date('2024-12-21T06:00:00.000Z'),
+                    capacity: 30,
+                },
+                {
+                    id: 2, //안겹침
+                    title: '강의2',
+                    startAt: new Date('2024-12-21T07:00:00.000Z'),
+                    endAt: new Date('2024-12-21T09:00:00.000Z'),
+                    capacity: 30,
+                },
+                {
+                    id: 3, //겹침
+                    title: '강의3',
+                    startAt: new Date('2024-12-21T05:00:00.000Z'),
+                    endAt: new Date('2024-12-21T07:00:00.000Z'),
+                    capacity: 30,
+                },
+                {
+                    id: 4, //안겹침
+                    title: '강의4',
+                    startAt: new Date('2024-12-21T10:00:00.000Z'),
+                    endAt: new Date('2024-12-21T11:00:00.000Z'),
+                    capacity: 30,
+                },
+            ];
+
+            lectureRepository.getUserLectures.mockResolvedValue(userLectures as Lecture[]);
+            lectureRepository.availableLectures.mockResolvedValue(
+                availableLectureList as Lecture[],
+            );
+
+            // when
+            const result = await service.getAvailableLectures(userId, startAt, endAt);
+
+            // then
+            expect(result).toBeDefined();
+            expect(result).toEqual([availableLectureList[1], availableLectureList[3]]);
+            expect(lectureRepository.getUserLectures).toHaveBeenCalledWith(userId);
+            expect(lectureRepository.availableLectures).toHaveBeenCalledWith(startAt, endAt);
         });
     });
 });

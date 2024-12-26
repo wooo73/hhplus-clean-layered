@@ -3,6 +3,7 @@ import { ILectureRepository } from './lecture.Irepository';
 import { ILectureHistoryRepository } from '../lecture-history/lecture-history.Irepository';
 import { DataSource } from 'typeorm';
 import { LectureHistory } from '../lecture-history/lecture-history';
+import { Lecture } from './lecture';
 
 @Injectable()
 export class LectureService {
@@ -63,5 +64,28 @@ export class LectureService {
         } finally {
             await queryRunner.release();
         }
+    }
+
+    async getAvailableLectures(userId: number, startAt: string, endAt: string): Promise<Lecture[]> {
+        const getUserLectures = await this.lectureRepository.getUserLectures(userId);
+        const userLectureIds = new Set(getUserLectures.map((lecture) => lecture.id));
+
+        const availableLectureList = await this.lectureRepository.availableLectures(startAt, endAt);
+
+        const filterAvailableLecture = availableLectureList.filter((lecture) => {
+            if (userLectureIds.has(lecture.id)) {
+                return false;
+            }
+
+            for (const userLecture of getUserLectures) {
+                if (userLecture.startAt < lecture.endAt && userLecture.endAt > lecture.startAt) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+
+        return filterAvailableLecture;
     }
 }
