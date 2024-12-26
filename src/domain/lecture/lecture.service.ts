@@ -88,4 +88,8 @@ export class LectureService {
 
         return filterAvailableLecture;
     }
+
+    async lectureHistory(userId: number): Promise<LectureHistory[]> {
+        return await this.lectureHistoryRepository.getUserLectureHistories(userId);
+    }
 }

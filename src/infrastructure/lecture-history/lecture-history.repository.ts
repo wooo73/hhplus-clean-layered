@@ -12,8 +12,14 @@ export class LectureHistoryRepository implements ILectureHistoryRepository {
         private lectureHistoryRepository: Repository<LectureHistory>,
     ) {}
 
+    async getUserLectureHistories(userId: number): Promise<LectureHistory[]> {
+        return await this.lectureHistoryRepository.find({
+            where: { userId },
+        });
+    }
+
     async findLectureHistory(userId: number, lectureId: number): Promise<LectureHistory> {
-        return this.lectureHistoryRepository.findOne({
+        return await this.lectureHistoryRepository.findOne({
             where: { userId, lectureId },
         });
     }

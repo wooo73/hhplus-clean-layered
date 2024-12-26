@@ -24,4 +24,10 @@ export class LectureController {
 
         return await this.lectureService.getAvailableLectures(userId, startAtDate, endAtDate);
     }
+
+    @Get('user/:userId/applied')
+    async lectureHistory(@Param('userId') id: string) {
+        const userId = parseInt(id);
+        return await this.lectureService.lectureHistory(userId);
+    }
 }

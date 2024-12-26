@@ -23,6 +23,7 @@ describe('LectureService', () => {
         };
 
         lectureHistoryRepository = {
+            getUserLectureHistories: jest.fn(),
             findLectureHistory: jest.fn(),
             isDuplicateLectureSchedule: jest.fn(),
             isLectureFull: jest.fn(),
@@ -357,6 +358,34 @@ describe('LectureService', () => {
             expect(result).toEqual([availableLectureList[1], availableLectureList[3]]);
             expect(lectureRepository.getUserLectures).toHaveBeenCalledWith(userId);
             expect(lectureRepository.availableLectures).toHaveBeenCalledWith(startAt, endAt);
+        });
+    });
+
+    describe('신청한 강의 목록 단위 테스트', () => {
+        it('SUCCESS_신청한 강의 목록을 응답 하는가?', async () => {
+            // given
+            const userId = 1;
+            const lectureId = 1;
+            const lectureTitle = '강의1';
+            const instructorName = '강사1';
+            const startAt = new Date('2024-12-21T04:00:00.000Z');
+            const endAt = new Date('2024-12-21T06:00:00.000Z');
+
+            const history: Partial<LectureHistory> = {
+                userId,
+                lectureId,
+                lectureTitle,
+                instructorName,
+                startAt,
+                endAt,
+            };
+
+            lectureHistoryRepository.getUserLectureHistories.mockResolvedValue(
+                history as LectureHistory[],
+            );
+
+            // when & then
+            expect(await service.lectureHistory(userId)).toEqual(history);
         });
     });
 });
